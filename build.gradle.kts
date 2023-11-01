@@ -26,6 +26,7 @@ dependencies {
 	implementation(files("$projectDir/jarlib/jadx-dev-all.jar"))
 	implementation("org.zeroturnaround:zt-zip:1.16")
 
+
 	runtimeOnly("com.h2database:h2")
 }
 

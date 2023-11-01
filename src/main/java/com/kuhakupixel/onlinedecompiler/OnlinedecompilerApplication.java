@@ -2,6 +2,7 @@ package com.kuhakupixel.onlinedecompiler;
 
 import java.io.Console;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,6 +12,11 @@ import java.util.List;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -25,7 +31,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import jadx.plugins.tools.JadxExternalPluginsLoader;
 import org.zeroturnaround.zip.ZipUtil;
-
 
 @SpringBootApplication
 @RestController
@@ -69,7 +74,7 @@ public class OnlinedecompilerApplication {
 	}
 
 	@PostMapping("/apk")
-	public String handleFileUpload(@RequestParam("file") MultipartFile file,
+	public ResponseEntity<Resource> handleFileUpload(@RequestParam("file") MultipartFile file,
 			RedirectAttributes redirectAttributes) throws IOException {
 
 		System.out.println("File name: " + file.getOriginalFilename());
@@ -90,16 +95,27 @@ public class OnlinedecompilerApplication {
 		jadxArgs.setOutDir(tempDecompilationDir.toFile());
 		jadxArgs.setExportAsGradleProject(true);
 
-		
 		try (JadxDecompiler jadx = new JadxDecompiler(jadxArgs)) {
 			jadx.load();
 			jadx.save();
 		}
 
 		System.out.println("Saving to decompilation to " + tempDecompilationDir.toString());
-		ZipUtil.pack(tempDecompilationDir.toFile(), new File("source.zip"));
+
+		File zippedDecompiledFolder = new File("source.zip");
+		ZipUtil.pack(tempDecompilationDir.toFile(), zippedDecompiledFolder);
 
 		// ============================================================
-		return "redirect:/";
+		// https://stackoverflow.com/questions/35680932/download-a-file-from-spring-boot-rest-service
+		InputStreamResource resource = new InputStreamResource(new FileInputStream(zippedDecompiledFolder));
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=source.zip");
+
+		return ResponseEntity.ok()
+				.headers(headers)
+				.contentLength(zippedDecompiledFolder.length())
+				.contentType(MediaType.APPLICATION_OCTET_STREAM)
+				.body(resource);
 	}
 }
