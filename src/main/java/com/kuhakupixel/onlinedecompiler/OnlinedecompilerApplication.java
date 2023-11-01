@@ -1,6 +1,7 @@
 package com.kuhakupixel.onlinedecompiler;
 
 import java.io.Console;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import jadx.plugins.tools.JadxExternalPluginsLoader;
+import org.zeroturnaround.zip.ZipUtil;
+
 
 @SpringBootApplication
 @RestController
@@ -94,6 +97,7 @@ public class OnlinedecompilerApplication {
 		}
 
 		System.out.println("Saving to decompilation to " + tempDecompilationDir.toString());
+		ZipUtil.pack(tempDecompilationDir.toFile(), new File("source.zip"));
 
 		// ============================================================
 		return "redirect:/";

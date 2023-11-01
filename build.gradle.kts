@@ -24,6 +24,7 @@ dependencies {
 	//runtimeOnly("io.github.skylot:jadx-dex-input:1.4.7")
 	//implementation("io.github.skylot:jadx-plugins-tools:1.4.7")
 	implementation(files("$projectDir/jarlib/jadx-dev-all.jar"))
+	implementation("org.zeroturnaround:zt-zip:1.16")
 
 	runtimeOnly("com.h2database:h2")
 }
