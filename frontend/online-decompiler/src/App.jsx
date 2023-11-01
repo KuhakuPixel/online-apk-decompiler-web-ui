@@ -7,12 +7,12 @@ function UploadApk() {
 
   return (
     <div>
-      <iframe name="dummyframe" id="dummyframe" style={{display:"none"}}></iframe>
+      <iframe name="dummyframe" id="dummyframe" style={{ display: "none" }}></iframe>
 
       <form method="POST" enctype="multipart/form-data" action="http://localhost:8080/apk" target="dummyframe">
         <table>
           <tr><td>File to upload:</td><td><input type="file" name="file" /></td></tr>
-          <tr><td></td><td><input type="submit" value="Upload" /></td></tr>
+          <tr><td><input type="submit" value="Upload" /></td></tr>
         </table>
       </form>
     </div>
