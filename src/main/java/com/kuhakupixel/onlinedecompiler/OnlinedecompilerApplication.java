@@ -1,6 +1,10 @@
 package com.kuhakupixel.onlinedecompiler;
 
 import java.io.Console;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +13,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import jadx.api.JadxArgs;
+import jadx.api.JadxDecompiler;
+import jadx.api.impl.NoOpCodeCache;
+import jadx.api.impl.SimpleCodeWriter;
+import jadx.cli.JadxCLI;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,9 +67,21 @@ public class OnlinedecompilerApplication {
 
 	@PostMapping("/apk")
 	public String handleFileUpload(@RequestParam("file") MultipartFile file,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes) throws IOException {
 
-		System.out.println("File name: " + file.getName());
+		System.out.println("File name: " + file.getOriginalFilename());
+		Path tempDir = Files.createTempDirectory("TempApkDir");
+		Path apkPath = Paths.get(tempDir.toString(), file.getOriginalFilename());
+		// load to file
+		file.transferTo(apkPath);
+		System.out.println("saving apk to: " + apkPath.toString());
+		// ============================ start decompilation process
+
+		Path tempDecompilationDir = Files.createTempDirectory("TempDecompiledApkDir");
+		JadxCLI.main(new String[]{apkPath.toString(),"-e","-d", tempDir.toString()});
+		System.out.println("Saving to decompilation to " + tempDecompilationDir.toString());
+
+		// ============================================================
 		return "redirect:/";
 	}
 }

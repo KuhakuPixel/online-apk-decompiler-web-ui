@@ -13,12 +13,18 @@ java {
 
 repositories {
 	mavenCentral()
+	google()
 }
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	//implementation("io.github.skylot:jadx-core:1.4.7")
+	//runtimeOnly("io.github.skylot:jadx-dex-input:1.4.7")
+	//implementation("io.github.skylot:jadx-plugins-tools:1.4.7")
+	implementation(files("$projectDir/jarlib/jadx-dev-all.jar"))
+
 	runtimeOnly("com.h2database:h2")
 }
 
