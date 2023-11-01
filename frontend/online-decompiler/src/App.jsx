@@ -6,6 +6,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+
 
 
 
@@ -30,6 +34,17 @@ function UploadApk() {
     </div>
   )
 }
+
+function ProjectDescription() {
+  return (
+    <div>
+      Uncover the hidden code within your favorite closed-source apps with
+      This website, which harnesses the power of JADX, an
+      open-source library, to transform APK files into easily readable and
+      editable Java code.
+    </div>
+  )
+}
 function App() {
   const [count, setCount] = useState(0)
   document.documentElement.setAttribute("data-bs-theme", "dark")
@@ -38,8 +53,17 @@ function App() {
     <>
       <div style={{ padding: "20px" }}>
         <h1> Online Apk Decompiler</h1>
+        <Container>
 
-        <UploadApk></UploadApk>
+          <Row>
+            <UploadApk></UploadApk>
+            <div style={{paddingTop:"20px"}}>
+              <ProjectDescription></ProjectDescription>
+            </div>
+
+          </Row>
+
+        </Container>
       </div>
     </>
   )
