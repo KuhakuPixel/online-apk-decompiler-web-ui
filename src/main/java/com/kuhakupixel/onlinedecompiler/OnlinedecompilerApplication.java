@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import jadx.plugins.tools.JadxExternalPluginsLoader;
 
 @SpringBootApplication
 @RestController
@@ -78,7 +79,21 @@ public class OnlinedecompilerApplication {
 		// ============================ start decompilation process
 
 		Path tempDecompilationDir = Files.createTempDirectory("TempDecompiledApkDir");
-		JadxCLI.main(new String[]{apkPath.toString(),"-e","-d", tempDir.toString()});
+
+		JadxArgs jadxArgs = new JadxArgs();
+		jadxArgs.setCodeCache(new NoOpCodeCache());
+		jadxArgs.setCodeWriterProvider(SimpleCodeWriter::new);
+		jadxArgs.setPluginLoader(new JadxExternalPluginsLoader());
+		jadxArgs.setInputFile(apkPath.toFile());
+		jadxArgs.setOutDir(tempDecompilationDir.toFile());
+		jadxArgs.setExportAsGradleProject(true);
+
+		
+		try (JadxDecompiler jadx = new JadxDecompiler(jadxArgs)) {
+			jadx.load();
+			jadx.save();
+		}
+
 		System.out.println("Saving to decompilation to " + tempDecompilationDir.toString());
 
 		// ============================================================
