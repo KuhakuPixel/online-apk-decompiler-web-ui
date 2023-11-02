@@ -9,3 +9,13 @@ powered by jadx
 frontend: reactjs
 
 backend: spring boot
+
+## Setup
+
+```sh
+docker-compose up
+```
+
+```sh
+docker-compose down && docker-compose build --no-cache && docker-compose up
+```

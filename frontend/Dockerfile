@@ -1,9 +1,10 @@
 FROM  node:21-alpine3.17
+WORKDIR /app/online-decompiler
+RUN cd /app/online-decompiler
 
-
-WORKDIR /app
 COPY . .
 
+RUN cat package.json
 RUN npm install
 
 EXPOSE 8000
