@@ -27,6 +27,8 @@ import jadx.api.JadxDecompiler;
 import jadx.api.impl.NoOpCodeCache;
 import jadx.api.impl.SimpleCodeWriter;
 import jadx.cli.JadxCLI;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -79,13 +81,14 @@ public class OnlinedecompilerApplication {
 		return null;
 	}
 
+	@CrossOrigin
 	@PostMapping("/apk")
 	public ResponseEntity<?> handleFileUpload(@RequestParam("file") MultipartFile file,
 			RedirectAttributes redirectAttributes) throws IOException {
 
 		System.out.println("File name: " + file.getOriginalFilename());
 		// check if its an apk and not some kind of other file
-		if (!FilenameUtils.getExtension(file.getOriginalFilename()).equals("apk")){
+		if (!FilenameUtils.getExtension(file.getOriginalFilename()).equals("apk")) {
 			return ResponseEntity.badRequest().body(null);
 		}
 		Path tempDir = Files.createTempDirectory("TempApkDir");
@@ -110,9 +113,7 @@ public class OnlinedecompilerApplication {
 			jadx.save();
 
 			System.out.println("Saving to decompilation to " + tempDecompilationDir.toString());
-		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(null);
-		}
+		} 
 		// ========================================== saving decompilation result
 		// =============
 
