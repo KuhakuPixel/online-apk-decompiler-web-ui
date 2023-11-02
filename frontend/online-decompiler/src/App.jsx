@@ -24,15 +24,18 @@ function UploadApk() {
   const [showProgressBar, setShowProgressBar] = useState(false);
   const [errMsg, setErrMsg] = useState("");
 
+  const [statusMsg, setStatusMsg] = useState("");
+
   async function onSubmit(e) {
     e.preventDefault();
 
     const formData = new FormData(e.target);
-    const data = new URLSearchParams(formData);
 
     setShowProgressBar(true);
     // clear previous err message 
     setErrMsg("");
+    setStatusMsg("decompiling apk, please kindly wait :)");
+    // make request
     const response = await fetch("http://localhost:8080/apk", {
       "referrer": "http://localhost:5173/",
       "referrerPolicy": "strict-origin-when-cross-origin",
@@ -41,6 +44,7 @@ function UploadApk() {
     });
     if (response.ok) {
       setShowProgressBar(false);
+      setStatusMsg("");
       console.log("request is ok")
 
       const blob = await response.blob();
@@ -48,6 +52,7 @@ function UploadApk() {
     }
     else {
       setShowProgressBar(false);
+      setStatusMsg("");
       setErrMsg("Input file is not valid, file must ends with .apk");
       console.log("request is not ok")
 
@@ -77,7 +82,8 @@ function UploadApk() {
         </Form>
       </div>
       <div>
-        <h3 style={{ color: "red" }}>{errMsg}</h3>
+        <span style={{ color: "red" }}>{errMsg}</span>
+        <span>{statusMsg}</span>
         {
           showProgressBar && <ProgressBar animated now={100} />
         }
