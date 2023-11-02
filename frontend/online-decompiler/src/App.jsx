@@ -22,27 +22,17 @@ import download from "downloadjs"
 function UploadApk() {
 
   const [showProgressBar, setShowProgressBar] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
 
   async function onSubmit(e) {
     e.preventDefault();
 
     const formData = new FormData(e.target);
     const data = new URLSearchParams(formData);
-    /*
-
-    fetch("http://localhost:8080/apk", {
-      method: "POST",
-      body: formData,
-      mode: "no-cors"
-
-    }).then(function (response) {
-      console.log(response.json());
-    }).catch(function (error) {
-      console.log('Request failed', error)
-    });;
-    */
 
     setShowProgressBar(true);
+    // clear previous err message 
+    setErrMsg("");
     const response = await fetch("http://localhost:8080/apk", {
       "referrer": "http://localhost:5173/",
       "referrerPolicy": "strict-origin-when-cross-origin",
@@ -58,6 +48,7 @@ function UploadApk() {
     }
     else {
       setShowProgressBar(false);
+      setErrMsg("Input file is not valid, file must ends with .apk");
       console.log("request is not ok")
 
     }
@@ -86,6 +77,7 @@ function UploadApk() {
         </Form>
       </div>
       <div>
+        <h3 style={{ color: "red" }}>{errMsg}</h3>
         {
           showProgressBar && <ProgressBar animated now={100} />
         }
