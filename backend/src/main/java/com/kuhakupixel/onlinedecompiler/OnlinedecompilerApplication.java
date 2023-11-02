@@ -34,6 +34,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import jadx.plugins.tools.JadxExternalPluginsLoader;
 import org.zeroturnaround.zip.ZipUtil;
 
+import org.apache.commons.io.FilenameUtils;
+
 @SpringBootApplication
 @RestController
 public class OnlinedecompilerApplication {
@@ -82,6 +84,10 @@ public class OnlinedecompilerApplication {
 			RedirectAttributes redirectAttributes) throws IOException {
 
 		System.out.println("File name: " + file.getOriginalFilename());
+		// check if its an apk and not some kind of other file
+		if (!FilenameUtils.getExtension(file.getOriginalFilename()).equals("apk")){
+			return ResponseEntity.badRequest().body(null);
+		}
 		Path tempDir = Files.createTempDirectory("TempApkDir");
 		Path apkPath = Paths.get(tempDir.toString(), file.getOriginalFilename());
 		// load to file
@@ -101,10 +107,6 @@ public class OnlinedecompilerApplication {
 
 		try (JadxDecompiler jadx = new JadxDecompiler(jadxArgs)) {
 			jadx.load();
-			int class_size = jadx.getClasses().size();
-			if (class_size == 0) {
-				return ResponseEntity.badRequest().body(null);
-			}
 			jadx.save();
 
 			System.out.println("Saving to decompilation to " + tempDecompilationDir.toString());

@@ -28,6 +28,7 @@ dependencies {
 
 
 	implementation("commons-codec:commons-codec:1.16.0")
+	implementation("commons-io:commons-io:2.15.0")
 
 	runtimeOnly("com.h2database:h2")
 }
