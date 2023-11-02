@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.boot.SpringApplication;
@@ -25,6 +26,7 @@ import jadx.api.JadxArgs;
 import jadx.api.JadxDecompiler;
 import jadx.api.impl.NoOpCodeCache;
 import jadx.api.impl.SimpleCodeWriter;
+import jadx.cli.JadxCLI;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +39,8 @@ import org.zeroturnaround.zip.ZipUtil;
 public class OnlinedecompilerApplication {
 
 	List<MyData> datas = new ArrayList<MyData>();
+	// store the current decompilation progress of the apk
+	HashMap<String, ProgressData> apkMd5ToProgressDataMap = new HashMap<String, ProgressData>();
 
 	public static void main(String[] args) {
 		SpringApplication.run(OnlinedecompilerApplication.class, args);
@@ -74,7 +78,7 @@ public class OnlinedecompilerApplication {
 	}
 
 	@PostMapping("/apk")
-	public ResponseEntity<Resource> handleFileUpload(@RequestParam("file") MultipartFile file,
+	public ResponseEntity<?> handleFileUpload(@RequestParam("file") MultipartFile file,
 			RedirectAttributes redirectAttributes) throws IOException {
 
 		System.out.println("File name: " + file.getOriginalFilename());
@@ -97,10 +101,18 @@ public class OnlinedecompilerApplication {
 
 		try (JadxDecompiler jadx = new JadxDecompiler(jadxArgs)) {
 			jadx.load();
+			int class_size = jadx.getClasses().size();
+			if (class_size == 0) {
+				return ResponseEntity.badRequest().body(null);
+			}
 			jadx.save();
-		}
 
-		System.out.println("Saving to decompilation to " + tempDecompilationDir.toString());
+			System.out.println("Saving to decompilation to " + tempDecompilationDir.toString());
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(null);
+		}
+		// ========================================== saving decompilation result
+		// =============
 
 		File zippedDecompiledFolder = new File("source.zip");
 		ZipUtil.pack(tempDecompilationDir.toFile(), zippedDecompiledFolder);
