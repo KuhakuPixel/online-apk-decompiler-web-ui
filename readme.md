@@ -1,16 +1,23 @@
-# 
+# Online Decompiler
 
+## decompile apk in one click in a website 
 
-decompile apk easily from a website
+![](./assets/showcase.gif)
 
-powered by jadx
+## Techstack
+### Frontend 
+- [Reactjs](https://react.dev/)
 
-## techstack
-frontend: reactjs
+### Backend 
+- [Spring Boot](https://spring.io/projects/spring-boot), [JADX](https://github.com/skylot/jadx)
 
-backend: spring boot
+## Running
 
-## Setup
+after running command below
+
+open http://localhost:8000/ to open the web app
+### Docker
+
 
 ```sh
 docker-compose up
@@ -19,4 +26,18 @@ docker-compose up
 fresh install [without cache](https://stackoverflow.com/a/44152540/14073678)
 ```sh
 docker-compose down && docker-compose build --no-cache && docker-compose up
+```
+### Locally
+
+run the backend 
+```sh
+cd backend
+gradle bootrun
+```
+
+run the frontend 
+
+```sh
+cd frontend
+npm run dev
 ```
