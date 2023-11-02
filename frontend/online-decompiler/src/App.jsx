@@ -20,6 +20,9 @@ import download from "downloadjs"
 
 
 function UploadApk() {
+
+  const [showProgressBar, setShowProgressBar] = useState(false);
+
   async function onSubmit(e) {
     e.preventDefault();
 
@@ -39,6 +42,7 @@ function UploadApk() {
     });;
     */
 
+    setShowProgressBar(true);
     const response = await fetch("http://localhost:8080/apk", {
       "referrer": "http://localhost:5173/",
       "referrerPolicy": "strict-origin-when-cross-origin",
@@ -46,17 +50,20 @@ function UploadApk() {
       "body": formData,
     });
     if (response.ok) {
+      setShowProgressBar(false);
       console.log("request is ok")
 
       const blob = await response.blob();
       download(blob, "source.zip")
     }
     else {
+      setShowProgressBar(false);
       console.log("request is not ok")
 
     }
 
   }
+
 
 
   return (
@@ -78,7 +85,13 @@ function UploadApk() {
 
         </Form>
       </div>
-      <ProgressBar animated now={100} />
+      <div>
+        {
+          showProgressBar && <ProgressBar animated now={100} />
+        }
+
+      </div>
+
     </div>
   )
 }
