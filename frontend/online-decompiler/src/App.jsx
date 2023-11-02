@@ -9,28 +9,90 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import ProgressBar from 'react-bootstrap/ProgressBar';
+import $ from 'jquery';
+import ajaxForm from "jquery-form"
+
+import download from "downloadjs"
 
 
 
 
 
 function UploadApk() {
+  async function onSubmit(e) {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const data = new URLSearchParams(formData);
+    /*
+
+    fetch("http://localhost:8080/apk", {
+      method: "POST",
+      body: formData,
+      mode: "no-cors"
+
+    }).then(function (response) {
+      console.log(response.json());
+    }).catch(function (error) {
+      console.log('Request failed', error)
+    });;
+    */
+
+    const response = await fetch("http://localhost:8080/apk", {
+      "headers": {
+        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "accept-language": "en-US,en;q=0.9",
+        "cache-control": "max-age=0",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Brave\";v=\"115\", \"Chromium\";v=\"115\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Linux\"",
+        "sec-fetch-dest": "iframe",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-site": "same-site",
+        "sec-fetch-user": "?1",
+        "sec-gpc": "1",
+        "upgrade-insecure-requests": "1"
+      },
+      "referrer": "http://localhost:5173/",
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "method": "POST",
+      "body": formData,
+    });
+    if (response.ok) {
+      console.log("request is ok")
+
+      const blob = await response.blob();
+      download(blob, "source.zip")
+    }
+    else {
+      console.log("request is not ok")
+
+    }
+
+  }
+
 
   return (
     <div >
       <iframe name="dummyframe" id="dummyframe" style={{ display: "none" }}></iframe>
 
-      <Form method="POST" enctype="multipart/form-data" action="http://localhost:8080/apk" target="dummyframe">
-        <Form.Group controlId="formFile" className="mb-3" >
-          <Form.Label>Choose apk file and press upload</Form.Label>
-          <Form.Control type="file" name="file" />
-        </Form.Group>
+      <div style={{ paddingBottom: "20px" }}>
+        <Form method="POST" enctype="multipart/form-data" target="dummyframe" id="myForm"
+          onSubmit={onSubmit}
+        >
+          <Form.Group controlId="formFile" className="mb-3" >
+            <Form.Label>Choose apk file and press upload</Form.Label>
+            <Form.Control type="file" name="file" />
+          </Form.Group>
 
-        <Button variant="primary" type="submit">
-          Upload
-        </Button>
+          <Button variant="primary" type="submit">
+            Upload
+          </Button>
 
-      </Form>
+        </Form>
+      </div>
+      <ProgressBar animated now={100} />
     </div>
   )
 }
@@ -57,7 +119,7 @@ function App() {
 
           <Row>
             <UploadApk></UploadApk>
-            <div style={{paddingTop:"20px"}}>
+            <div style={{ paddingTop: "20px" }}>
               <ProjectDescription></ProjectDescription>
             </div>
 
