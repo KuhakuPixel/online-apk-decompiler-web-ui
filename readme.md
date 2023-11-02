@@ -16,6 +16,7 @@ backend: spring boot
 docker-compose up
 ```
 
+fresh install [without cache](https://stackoverflow.com/a/44152540/14073678)
 ```sh
 docker-compose down && docker-compose build --no-cache && docker-compose up
 ```
