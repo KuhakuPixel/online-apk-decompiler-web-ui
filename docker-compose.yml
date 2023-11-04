@@ -1,5 +1,9 @@
 version: "1"
 
+# https://javatodev.com/docker-compose-for-spring-boot-with-mongodb/
+# https://www.mongodb.com/compatibility/docker
+# https://dev.to/sonyarianto/how-to-spin-mongodb-server-with-docker-and-docker-compose-2lef
+
 services:
   backend:
     build: 
@@ -7,6 +11,11 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - 8080:8080
+    depends_on:
+      - mongodb
+    volumes:
+      # https://stackoverflow.com/questions/40905761/how-do-i-mount-a-host-directory-as-a-volume-in-docker-compose
+      - ./backend/decompiled_sources:/app/decompiled_sources
 
   frontend:
     build: 
@@ -16,4 +25,14 @@ services:
       - backend
     ports:
       - 8000:8000
+
+  mongodb:
+    image: mongo:6-jammy
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
 
