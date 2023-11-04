@@ -31,6 +31,8 @@ dependencies {
 	implementation("commons-io:commons-io:2.15.0")
 
 	runtimeOnly("com.h2database:h2")
+	
+	implementation ("org.springframework.boot:spring-boot-starter-data-mongodb")
 }
 
 tasks.withType<Test> {
