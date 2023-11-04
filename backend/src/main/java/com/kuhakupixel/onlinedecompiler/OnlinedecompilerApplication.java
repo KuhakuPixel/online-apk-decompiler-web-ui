@@ -103,12 +103,14 @@ public class OnlinedecompilerApplication {
 		String apkHash = Util.md5OfFile(apkPath.toFile());
 		File zippedSourceOut = new File(decompiledSourceBasePath.toString(), apkHash + ".zip");
 
-		DecompilerWrapper.GetSource(apkPath, zippedSourceOut);
-		// https://stackoverflow.com/questions/35680932/download-a-file-from-spring-boot-rest-service
+		// cache
+		if (!zippedSourceOut.exists()) {
+			DecompilerWrapper.GetSource(apkPath, zippedSourceOut);
+			// https://stackoverflow.com/questions/35680932/download-a-file-from-spring-boot-rest-service
+		}
 		InputStreamResource resource = new InputStreamResource(new FileInputStream(zippedSourceOut));
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=source.zip");
-
 		return ResponseEntity.ok()
 				.headers(headers)
 				.contentLength(zippedSourceOut.length())
