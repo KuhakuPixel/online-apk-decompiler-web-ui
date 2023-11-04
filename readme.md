@@ -5,6 +5,14 @@ decompile closed source apk back into java code
 
 ![](./assets/showcase.gif)
 
+## Features
+
+- get apk's java source code
+
+- caching system for apk previously uploaded
+
+- view all methods and class name in the web
+
 ## Techstack
 ### Frontend 
 - [Reactjs](https://react.dev/)
