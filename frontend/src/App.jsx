@@ -16,15 +16,54 @@ import md5 from "js-md5"
 
 import download from "downloadjs"
 
-const BASE_API_URL = "http://localhost:8080/"
+const BASE_API_URL = "http://localhost:8080"
+
+const APK_DECOMPILE_API_URL = [BASE_API_URL, "apk"].join("/")
+
+const APK_INFO_API_URL = [APK_DECOMPILE_API_URL, "info"].join("/")
+
+const METHODS_SHOWN_LIMIT = 10000;
 
 
 
-function getApkClassInfos(apkHash) {
+async function getApkClassInfos(apkHash, onGetApkInfo) {
+  const requestUrl = [APK_INFO_API_URL, apkHash].join("/")
+
+  const response = await fetch(requestUrl, {
+    "method": "get",
+  }
+  );
+
+  if (response.ok) {
+    // console.log("request is ok")
+    const responseBody = await response.json();
+    onGetApkInfo(responseBody);
+
+    _methodShownItem = []
+    for (let i = 0; i < responseBody.length; i++) {
+      const javaClass = responseBody[i]
+      const javaClassName = javaClass["className"]
+      const methods = javaClass["methodStrings"]
+
+      _methodShownItem.push(
+        <div>
+          <h3> {javaClassName}</h3>
+          {
+            methods.map(method =>
+              <li>{method}</li>
+            )
+
+          }
+
+        </div>
+      );
+    }
+    setMethodShownItem(_methodShownItem)
+  }
 
 }
 
-function UploadApk() {
+function UploadApk({ onGetApkInfo }) {
 
   const [showProgressBar, setShowProgressBar] = useState(false);
   const [errMsg, setErrMsg] = useState("");
@@ -44,7 +83,7 @@ function UploadApk() {
     setApkHash("");
     setStatusMsg("decompiling apk, please kindly wait :)");
     // make request
-    const response = await fetch(BASE_API_URL + "apk", {
+    const response = await fetch(APK_DECOMPILE_API_URL, {
       "referrerPolicy": "strict-origin-when-cross-origin",
       "method": "POST",
       "body": formData,
@@ -58,6 +97,8 @@ function UploadApk() {
       download(blob, "source.zip")
       const currentApkHash = response.headers.get("Apkhash")
       setApkHash(currentApkHash);
+
+      getApkClassInfos(currentApkHash, onGetApkInfo)
 
     }
     else {
@@ -124,7 +165,7 @@ function ProjectDescription() {
   )
 }
 function App() {
-  const [count, setCount] = useState(0)
+  const [methodShownItem, setMethodShownItem] = useState([]);
   document.documentElement.setAttribute("data-bs-theme", "dark")
 
   return (
@@ -134,11 +175,46 @@ function App() {
         <Container>
 
           <Row>
-            <UploadApk></UploadApk>
+            <UploadApk onGetApkInfo={
+              function (responseBody) {
+
+                const _methodShownItem = []
+                // set some limit
+                const shownMethodLength = Math.min(responseBody.length, METHODS_SHOWN_LIMIT);
+                for (let i = 0; i < shownMethodLength; i++) {
+                  const javaClass = responseBody[i]
+                  const javaClassName = javaClass["className"]
+                  const methods = javaClass["methodStrings"]
+
+                  _methodShownItem.push(
+                    <div>
+                      <h3> {javaClassName}</h3>
+                      {
+                        methods.map(method =>
+                          <li>{method}</li>
+                        )
+
+                      }
+
+                    </div>
+                  );
+                }
+                setMethodShownItem(_methodShownItem)
+
+              }}>
+
+
+            </UploadApk>
             <div style={{ paddingTop: "20px" }}>
               <ProjectDescription></ProjectDescription>
             </div>
 
+            <div>
+              {
+                methodShownItem.length > 0 && (<h2> Class And Methods (showing only{METHODS_SHOWN_LIMIT} methods)</h2>)
+              }
+              {methodShownItem}
+            </div>
           </Row>
 
         </Container>
