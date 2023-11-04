@@ -45,6 +45,7 @@ public class OnlinedecompilerApplication {
 	// store the current decompilation progress of the apk
 	HashMap<String, ProgressData> apkMd5ToProgressDataMap = new HashMap<String, ProgressData>();
 	HashMap<String, Path> apkMd5ToSourceCodeZip = new HashMap<String, Path>();
+	File decompiledSourceBasePath = new File("decompiled_sources");
 
 	public static void main(String[] args) {
 		SpringApplication.run(OnlinedecompilerApplication.class, args);
@@ -92,11 +93,18 @@ public class OnlinedecompilerApplication {
 			return ResponseEntity.badRequest().body(null);
 		}
 		// ============================================================
+		// ========= make some temporary directory
+		Path tempDir = Files.createTempDirectory("TempApkDir");
+		Path apkPath = Paths.get(tempDir.toString(), file.getOriginalFilename());
+		// ==================================================
+		// load to file
+		file.transferTo(apkPath);
+		// calculate its hash and set it as an output
+		String apkHash = Util.md5OfFile(apkPath.toFile());
+		File zippedSourceOut = new File(decompiledSourceBasePath.toString(), apkHash + ".zip");
+
+		DecompilerWrapper.GetSource(apkPath, zippedSourceOut);
 		// https://stackoverflow.com/questions/35680932/download-a-file-from-spring-boot-rest-service
-		File zippedSourceOut = new File("source.zip");
-
-		DecompilerWrapper.GetSource(file, zippedSourceOut);
-
 		InputStreamResource resource = new InputStreamResource(new FileInputStream(zippedSourceOut));
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=source.zip");

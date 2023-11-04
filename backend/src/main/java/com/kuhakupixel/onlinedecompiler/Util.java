@@ -8,10 +8,10 @@ import java.nio.file.Paths;
 
 public class Util {
 
-    public String md5OfFile(File file) {
+    public static String md5OfFile(File file) {
         String md5 = "";
 
-        try (InputStream is = Files.newInputStream(Paths.get("file.zip"))) {
+        try (InputStream is = Files.newInputStream(file.toPath())) {
             md5 = org.apache.commons.codec.digest.DigestUtils.md5Hex(is);
 
         } catch (IOException e) {

@@ -18,12 +18,8 @@ import org.zeroturnaround.zip.ZipUtil;
 
 public class DecompilerWrapper {
 
-    public static void GetSource(MultipartFile file, File zipSourceOut)throws IOException {
+    public static void GetSource(Path apkPath, File zipSourceOut)throws IOException {
 
-        Path tempDir = Files.createTempDirectory("TempApkDir");
-        Path apkPath = Paths.get(tempDir.toString(), file.getOriginalFilename());
-        // load to file
-        file.transferTo(apkPath);
         System.out.println("saving apk to: " + apkPath.toString());
         // ============================ start decompilation process
 
