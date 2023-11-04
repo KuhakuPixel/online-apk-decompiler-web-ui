@@ -12,12 +12,17 @@ import Col from 'react-bootstrap/Col';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import $ from 'jquery';
 import ajaxForm from "jquery-form"
+import md5 from "js-md5"
 
 import download from "downloadjs"
 
+const BASE_API_URL = "http://localhost:8080/"
 
 
 
+function getApkClassInfos(apkHash) {
+
+}
 
 function UploadApk() {
 
@@ -26,18 +31,20 @@ function UploadApk() {
 
   const [statusMsg, setStatusMsg] = useState("");
 
+  const [apkHash, setApkHash] = useState("");
+
   async function onSubmit(e) {
     e.preventDefault();
 
     const formData = new FormData(e.target);
 
     setShowProgressBar(true);
-    // clear previous err message 
+    // clear previous err message  and hash message
     setErrMsg("");
+    setApkHash("");
     setStatusMsg("decompiling apk, please kindly wait :)");
     // make request
-    const response = await fetch("http://localhost:8080/apk", {
-      "referrer": "http://localhost:5173/",
+    const response = await fetch(BASE_API_URL + "apk", {
       "referrerPolicy": "strict-origin-when-cross-origin",
       "method": "POST",
       "body": formData,
@@ -49,6 +56,9 @@ function UploadApk() {
 
       const blob = await response.blob();
       download(blob, "source.zip")
+      const currentApkHash = response.headers.get("Apkhash")
+      setApkHash(currentApkHash);
+
     }
     else {
       setShowProgressBar(false);
@@ -88,9 +98,18 @@ function UploadApk() {
           showProgressBar && <ProgressBar animated now={100} />
         }
 
+        {
+          apkHash !== "" ? (
+            <span>
+              md5: <span style={{ color: "green" }}>{apkHash}</span>
+            </span>
+          ) :
+            (<div></div>)
+        }
+
       </div>
 
-    </div>
+    </div >
   )
 }
 
