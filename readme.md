@@ -23,6 +23,19 @@ decompile closed source apk back into java code
 ### Database
 - [mongodb](https://www.mongodb.com/)
 
+
+## Setup
+
+
+```sh
+git clone https://github.com/KuhakuPixel/online-apk-decompiler-web-ui.git
+# https://stackoverflow.com/questions/72830343/retrieve-original-files-after-a-git-clone-with-git-lfs
+# Fetch all the LFS files from the remote
+git lfs fetch
+# Replace the pointer files to the actual files
+git lfs checkout
+```
+
 ## Running
 
 after running command below
@@ -37,7 +50,7 @@ docker-compose up
 
 fresh install [without cache](https://stackoverflow.com/a/44152540/14073678)
 ```sh
-docker-compose down && docker-compose build --no-cache && docker-compose up
+docker compose down && docker compose build --no-cache && docker compose up
 ```
 
 ### Locally
