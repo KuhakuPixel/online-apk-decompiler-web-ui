@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import jadx.plugins.tools.JadxExternalPluginsLoader;
 
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @SpringBootApplication
 @RestController
@@ -44,8 +46,9 @@ public class OnlinedecompilerApplication {
 
 	List<MyData> datas = new ArrayList<MyData>();
 	File decompiledSourceBasePath = new File("decompiled_sources");
-	// TODO: use database for persistence
-	HashMap<String, List<ClassInfo>> apkMd5ToClassInfoArrayMap = new HashMap<String, List<ClassInfo>>();
+
+	@Autowired
+	private ApkInfoDataRepository repository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(OnlinedecompilerApplication.class, args);
@@ -86,9 +89,12 @@ public class OnlinedecompilerApplication {
 	@GetMapping("/apk/info/{apkHash}")
 	List<ClassInfo> getApkInfo(@PathVariable String apkHash) {
 		System.out.println("getting apk info: " + apkHash);
-		return apkMd5ToClassInfoArrayMap.get(apkHash);
+		Optional<ApkInfoData> apkInfoData = repository.findById(apkHash);
+		if (apkInfoData.isPresent()) {
+			return apkInfoData.get().classInfos;
+		} else
+			return null;
 	}
-
 
 	@CrossOrigin
 	@PostMapping("/apk")
@@ -115,14 +121,15 @@ public class OnlinedecompilerApplication {
 		if (!zippedSourceOut.exists()) {
 			List<ClassInfo> classInfos = DecompilerWrapper.GetSource(apkPath, zippedSourceOut);
 			// save the information
-			apkMd5ToClassInfoArrayMap.put(apkHash, classInfos);
+			ApkInfoData apkInfoData = new ApkInfoData(apkHash, classInfos);
+			repository.save(apkInfoData);
 		}
 
 		// https://stackoverflow.com/questions/35680932/download-a-file-from-spring-boot-rest-service
 		InputStreamResource resource = new InputStreamResource(new FileInputStream(zippedSourceOut));
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=source.zip");
-		// abit of a hack but just send back the hash in the header, 
+		// abit of a hack but just send back the hash in the header,
 		// https://stackoverflow.com/questions/73499438/spring-boot-does-not-seem-to-expose-a-custom-header-to-my-frontend
 		headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "apkHash");
 		headers.set("apkHash", apkHash);

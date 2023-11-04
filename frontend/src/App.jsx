@@ -22,7 +22,7 @@ const APK_DECOMPILE_API_URL = [BASE_API_URL, "apk"].join("/")
 
 const APK_INFO_API_URL = [APK_DECOMPILE_API_URL, "info"].join("/")
 
-const METHODS_SHOWN_LIMIT = 10000;
+const METHODS_SHOWN_LIMIT = 1000;
 
 
 
@@ -211,7 +211,7 @@ function App() {
 
             <div>
               {
-                methodShownItem.length > 0 && (<h2> Class And Methods (showing only{METHODS_SHOWN_LIMIT} methods)</h2>)
+                methodShownItem.length > 0 && (<h2> Class And Methods (showing only {METHODS_SHOWN_LIMIT} methods)</h2>)
               }
               {methodShownItem}
             </div>
