@@ -89,6 +89,7 @@ public class OnlinedecompilerApplication {
 		return apkMd5ToClassInfoArrayMap.get(apkHash);
 	}
 
+
 	@CrossOrigin
 	@PostMapping("/apk")
 	public ResponseEntity<?> handleFileUpload(@RequestParam("file") MultipartFile file,
@@ -121,6 +122,10 @@ public class OnlinedecompilerApplication {
 		InputStreamResource resource = new InputStreamResource(new FileInputStream(zippedSourceOut));
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=source.zip");
+		// abit of a hack but just send back the hash in the header, 
+		// https://stackoverflow.com/questions/73499438/spring-boot-does-not-seem-to-expose-a-custom-header-to-my-frontend
+		headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "apkHash");
+		headers.set("apkHash", apkHash);
 		return ResponseEntity.ok()
 				.headers(headers)
 				.contentLength(zippedSourceOut.length())
