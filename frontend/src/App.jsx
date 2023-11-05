@@ -14,6 +14,7 @@ import $ from 'jquery';
 import ajaxForm from "jquery-form"
 import md5 from "js-md5"
 
+import Table from 'react-bootstrap/Table';
 import download from "downloadjs"
 
 const BASE_API_URL = "http://localhost:8080"
@@ -23,6 +24,7 @@ const APK_DECOMPILE_API_URL = [BASE_API_URL, "apk"].join("/")
 const APK_INFO_API_URL = [APK_DECOMPILE_API_URL, "info"].join("/")
 
 const METHODS_SHOWN_LIMIT = 1000;
+
 
 
 
@@ -38,27 +40,6 @@ async function getApkClassInfos(apkHash, onGetApkInfo) {
     // console.log("request is ok")
     const responseBody = await response.json();
     onGetApkInfo(responseBody);
-
-    _methodShownItem = []
-    for (let i = 0; i < responseBody.length; i++) {
-      const javaClass = responseBody[i]
-      const javaClassName = javaClass["className"]
-      const methods = javaClass["methodStrings"]
-
-      _methodShownItem.push(
-        <div>
-          <h3> {javaClassName}</h3>
-          {
-            methods.map(method =>
-              <li>{method}</li>
-            )
-
-          }
-
-        </div>
-      );
-    }
-    setMethodShownItem(_methodShownItem)
   }
 
 }
@@ -188,14 +169,28 @@ function App() {
 
                   _methodShownItem.push(
                     <div>
-                      <h3> {javaClassName}</h3>
-                      {
-                        methods.map(method =>
-                          <li>{method}</li>
-                        )
+                      <Table striped bordered hover>
+                        <thead>
+                          <tr>
+                            <td colSpan={2}> {javaClassName} </td>
+                          </tr>
+                          <tr>
+                            <th>#</th>
+                            <th>Methods</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {
+                            methods.map((method, i) =>
+                              <tr>
+                                <td>{i + 1}</td>
+                                <td>{method}</td>
+                              </tr>
+                            )
 
-                      }
-
+                          }
+                        </tbody>
+                      </Table>
                     </div>
                   );
                 }
