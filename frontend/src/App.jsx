@@ -172,7 +172,7 @@ function App() {
                       <Table striped bordered hover>
                         <thead>
                           <tr>
-                            <td colSpan={2}> {javaClassName} </td>
+                            <td colSpan={2}><b>{i + 1}. {javaClassName} </b></td>
                           </tr>
                           <tr>
                             <th>#</th>
